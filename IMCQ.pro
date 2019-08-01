@@ -17,10 +17,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp\
+        m2mfun.cpp \
         mainwindow.cpp
 
-HEADERS  += mainwindow.h
-FORMS    += mainwindow.ui
+HEADERS  += mainwindow.h \
+    m2mfun.h
+FORMS    += mainwindow.ui \
+    m2mfun.ui
 
 target.path = $$[QT_INSTALL_EXAMPLES]/mqtt/IMCQ
 INSTALLS += target
@@ -32,4 +35,4 @@ INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/include
 
 RESOURCES +=
-RC_ICONS = /images/bitbug_favicon.ico
+RC_ICONS = /bitbug_favicon.ico

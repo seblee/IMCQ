@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_client = new QMqttClient(this);
 
     m_client->setHostname(ui->lineEditHost->text());
-    m_client->setPort(ui->spinBoxPort->value());
+    m_client->setPort(static_cast<quint16>(ui->spinBoxPort->value()));
     m_client->setUsername(ui->lineEditUserName->text());
     m_client->setPassword(ui->lineEditPassWord->text());
     m_client->setClientId(ui->lineEditClientID->text());
@@ -107,22 +107,27 @@ MainWindow::MainWindow(QWidget *parent) :
             &QLineEdit::textChanged,
             m_client,
             &QMqttClient::setHostname);
+
     connect(ui->spinBoxPort,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
             &MainWindow::setClientPort);
+
     connect(ui->lineEditUserName,
             &QLineEdit::textChanged,
             m_client,
             &QMqttClient::setUsername);
+
     connect(ui->lineEditPassWord,
             &QLineEdit::textChanged,
             m_client,
             &QMqttClient::setPassword);
+
     connect(ui->lineEditClientID,
             &QLineEdit::textChanged,
             m_client,
             &QMqttClient::setClientId);
+
     updateLogStateChange();
 }
 
@@ -170,7 +175,7 @@ void MainWindow::brokerDisconnected()
 
 void MainWindow::setClientPort(int p)
 {
-    m_client->setPort(p);
+    m_client->setPort(static_cast<quint16>(p));
 }
 
 void MainWindow::on_buttonPublish_clicked()
@@ -202,3 +207,14 @@ void MainWindow::on_buttonPing_clicked()
     ui->buttonPing->setEnabled(false);
     m_client->requestPing();
 }
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        this->close();
+    }
+}
+
+void MainWindow::on_ButtonOpen_clicked()
+{}

@@ -54,6 +54,9 @@
 
 #include <QMainWindow>
 #include <QtMqtt/QMqttClient>
+#include <QKeyEvent>
+
+#include "m2mfun.h"
 
 namespace Ui {
 class MainWindow;
@@ -64,7 +67,7 @@ class MainWindow : public QMainWindow {
 
 public:
 
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 public slots:
@@ -85,10 +88,15 @@ private slots:
 
     void on_buttonPing_clicked();
 
+    void on_ButtonOpen_clicked();
+
 private:
 
     Ui::MainWindow *ui;
     QMqttClient *m_client;
+
+    void keyPressEvent(QKeyEvent *event);
+    void key_p(void);
 };
 
 #endif // MAINWINDOW_H

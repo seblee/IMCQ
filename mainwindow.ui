@@ -105,31 +105,10 @@
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_9">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditSubscribe">
         <property name="text">
-         <string>M2MPut</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QPushButton" name="buttonPing">
-        <property name="text">
-         <string>Ping</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEditPublish">
-        <property name="text">
-         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MPUT</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>M2MGet</string>
+         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MGET</string>
         </property>
        </widget>
       </item>
@@ -140,10 +119,45 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>M2MGet</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEditPublish">
+        <property name="text">
+         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MPUT</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="buttonPing">
+        <property name="text">
+         <string>Ping</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>M2MPut</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="buttonSubscribe">
         <property name="text">
          <string>Subscribe</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lineEditMessage">
+        <property name="text">
+         <string>This is a test message</string>
         </property>
        </widget>
       </item>
@@ -154,17 +168,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEditSubscribe">
+      <item row="3" column="2">
+       <widget class="QPushButton" name="ButtonOpen">
         <property name="text">
-         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MGET</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEditMessage">
-        <property name="text">
-         <string>This is a test message</string>
+         <string>Open</string>
         </property>
        </widget>
       </item>
