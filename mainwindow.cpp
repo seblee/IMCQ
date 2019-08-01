@@ -63,8 +63,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     m_client = new QMqttClient(this);
+
     m_client->setHostname(ui->lineEditHost->text());
     m_client->setPort(ui->spinBoxPort->value());
+    m_client->setUsername(ui->lineEditUserName->text());
+    m_client->setPassword(ui->lineEditPassWord->text());
+    m_client->setClientId(ui->lineEditClientID->text());
+    m_client->setProtocolVersion(QMqttClient::MQTT_3_1);
 
     connect(m_client,
             &QMqttClient::stateChanged,
@@ -93,6 +98,10 @@ MainWindow::MainWindow(QWidget *parent) :
                                 + QLatin1Char('\n');
         ui->editLog->insertPlainText(content);
     });
+    connect(m_client, &QMqttClient::errorChanged, this, [this]() {
+        const QString content = QString::number(m_client->error());
+        ui->statusBar->showMessage(content, 3000);
+    });
 
     connect(ui->lineEditHost,
             &QLineEdit::textChanged,
@@ -102,6 +111,18 @@ MainWindow::MainWindow(QWidget *parent) :
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
             &MainWindow::setClientPort);
+    connect(ui->lineEditUserName,
+            &QLineEdit::textChanged,
+            m_client,
+            &QMqttClient::setUsername);
+    connect(ui->lineEditPassWord,
+            &QLineEdit::textChanged,
+            m_client,
+            &QMqttClient::setPassword);
+    connect(ui->lineEditClientID,
+            &QLineEdit::textChanged,
+            m_client,
+            &QMqttClient::setClientId);
     updateLogStateChange();
 }
 
@@ -116,7 +137,7 @@ void MainWindow::on_buttonConnect_clicked()
         ui->lineEditHost->setEnabled(false);
         ui->spinBoxPort->setEnabled(false);
         ui->buttonConnect->setText(tr("Disconnect"));
-        m_client->connectToHost();
+        m_client->connectToHostEncrypted();
     } else {
         ui->lineEditHost->setEnabled(true);
         ui->spinBoxPort->setEnabled(true);

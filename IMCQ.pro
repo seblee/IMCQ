@@ -2,7 +2,7 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = simplemqttclient
+TARGET = IMCQ
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -22,7 +22,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h
 FORMS    += mainwindow.ui
 
-target.path = $$[QT_INSTALL_EXAMPLES]/mqtt/simpleclient
+target.path = $$[QT_INSTALL_EXAMPLES]/mqtt/IMCQ
 INSTALLS += target
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/lib/ -lQt5Mqtt

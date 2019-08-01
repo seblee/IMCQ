@@ -29,7 +29,7 @@
         <item row="0" column="1">
          <widget class="QLineEdit" name="lineEditHost">
           <property name="text">
-           <string/>
+           <string>a1BlDo53A1B.iot-as-mqtt.cn-shanghai.aliyuncs.com</string>
           </property>
          </widget>
         </item>
@@ -50,6 +50,48 @@
           </property>
          </widget>
         </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>ClientID:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="lineEditClientID">
+          <property name="text">
+           <string>ClientM2MB|securemode=2,signmethod=hmacmd5|</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>UserName:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="lineEditUserName">
+          <property name="text">
+           <string>cGvEQo0ShL2iCbVuurVG&amp;a1BlDo53A1B</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>PassWord:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="lineEditPassWord">
+          <property name="text">
+           <string>22924838AD0F92CCCBE1BD590C831084</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -63,10 +105,17 @@
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="buttonPublish">
+        <property name="text">
+         <string>Publish</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEditTopic">
         <property name="text">
-         <string>qtmqtt/topic1</string>
+         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MPUT</string>
         </property>
        </widget>
       </item>
@@ -77,17 +126,24 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEditMessage">
         <property name="text">
-         <string>Message:</string>
+         <string>This is a test message</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="buttonPublish">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Publish</string>
+         <string>M2MGet</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="buttonPing">
+        <property name="text">
+         <string>Ping</string>
         </property>
        </widget>
       </item>
@@ -98,17 +154,31 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEditMessage">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>This is a test message</string>
+         <string>Message:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QPushButton" name="buttonPing">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Ping</string>
+         <string>M2MPut</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="text">
+         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MGET</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="lineEdit_2">
+        <property name="text">
+         <string>/a1BlDo53A1B/cGvEQo0ShL2iCbVuurVG/user/M2MPUT</string>
         </property>
        </widget>
       </item>
