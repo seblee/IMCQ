@@ -30,3 +30,6 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/lib/ -lQt5Mqttd
 
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/include
+
+RESOURCES +=
+RC_ICONS = /images/bitbug_favicon.ico

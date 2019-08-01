@@ -175,7 +175,7 @@ void MainWindow::setClientPort(int p)
 
 void MainWindow::on_buttonPublish_clicked()
 {
-    if (m_client->publish(ui->lineEditTopic->text(),
+    if (m_client->publish(ui->lineEditPublish->text(),
                           ui->lineEditMessage->text().toUtf8()) ==
         -1) QMessageBox::critical(this,
                                   QLatin1String(
@@ -186,7 +186,7 @@ void MainWindow::on_buttonPublish_clicked()
 
 void MainWindow::on_buttonSubscribe_clicked()
 {
-    auto subscription = m_client->subscribe(ui->lineEditTopic->text());
+    auto subscription = m_client->subscribe(ui->lineEditSubscribe->text());
 
     if (!subscription) {
         QMessageBox::critical(this,
