@@ -48,7 +48,6 @@
 **
 ****************************************************************************/
 
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -56,9 +55,8 @@
 #include <QtMqtt/QMqttClient>
 #include <QtWidgets/QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(
+        new Ui::MainWindow), m_client(nullptr), m2mfun(nullptr)
 {
     ui->setupUi(this);
 
@@ -71,31 +69,29 @@ MainWindow::MainWindow(QWidget *parent) :
     m_client->setClientId(ui->lineEditClientID->text());
     m_client->setProtocolVersion(QMqttClient::MQTT_3_1);
 
-    connect(m_client,
-            &QMqttClient::stateChanged,
-            this,
+    connect(m_client, &QMqttClient::stateChanged,    this,
             &MainWindow::updateLogStateChange);
-    connect(m_client,
-            &QMqttClient::disconnected,
-            this,
+    connect(m_client, &QMqttClient::disconnected,    this,
             &MainWindow::brokerDisconnected);
 
-    connect(m_client, &QMqttClient::messageReceived, this,
-            [this](const QByteArray& message, const QMqttTopicName& topic) {
-        const QString content = QDateTime::currentDateTime().toString()
-                                + QLatin1String(" Received Topic: ")
-                                + topic.name()
-                                + QLatin1String(" Message: ")
-                                + message
-                                + QLatin1Char('\n');
+    connect(m_client, &QMqttClient::messageReceived, this, [this](const
+                                                                  QByteArray&
+                                                                  message,
+                                                                  const
+                                                                  QMqttTopicName&
+                                                                  topic) {
+        const QString content = QDateTime::currentDateTime().toString() +
+                                QLatin1String(
+            " Received Topic: ") + topic.name() + QLatin1String(
+            " Message: ") + message + QLatin1Char('\n');
         ui->editLog->insertPlainText(content);
     });
 
     connect(m_client, &QMqttClient::pingResponseReceived, this, [this]() {
         ui->buttonPing->setEnabled(true);
-        const QString content = QDateTime::currentDateTime().toString()
-                                + QLatin1String(" PingResponse")
-                                + QLatin1Char('\n');
+        const QString content = QDateTime::currentDateTime().toString() +
+                                QLatin1String(" PingResponse") + QLatin1Char(
+            '\n');
         ui->editLog->insertPlainText(content);
     });
     connect(m_client, &QMqttClient::errorChanged, this, [this]() {
@@ -138,12 +134,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_buttonConnect_clicked()
 {
-    if (m_client->state() == QMqttClient::Disconnected) {
+    if (m_client->state() == QMqttClient::Disconnected)
+    {
         ui->lineEditHost->setEnabled(false);
         ui->spinBoxPort->setEnabled(false);
         ui->buttonConnect->setText(tr("Disconnect"));
         m_client->connectToHostEncrypted();
-    } else {
+    }
+    else
+    {
         ui->lineEditHost->setEnabled(true);
         ui->spinBoxPort->setEnabled(true);
         ui->buttonConnect->setText(tr("Connect"));
@@ -158,10 +157,10 @@ void MainWindow::on_buttonQuit_clicked()
 
 void MainWindow::updateLogStateChange()
 {
-    const QString content = QDateTime::currentDateTime().toString()
-                            + QLatin1String(": State Change")
-                            + QString::number(m_client->state())
-                            + QLatin1Char('\n');
+    const QString content = QDateTime::currentDateTime().toString() +
+                            QLatin1String(": State Change") + QString::number(
+        m_client->state()) +
+                            QLatin1Char('\n');
 
     ui->editLog->insertPlainText(content);
 }
@@ -181,19 +180,19 @@ void MainWindow::setClientPort(int p)
 void MainWindow::on_buttonPublish_clicked()
 {
     if (m_client->publish(ui->lineEditPublish->text(),
-                          ui->lineEditMessage->text().toUtf8()) ==
-        -1) QMessageBox::critical(this,
-                                  QLatin1String(
-                                      "Error"),
-                                  QLatin1String(
-                                      "Could not publish message"));
+                          ui->lineEditMessage->text().toUtf8()) == -1)
+    {
+        QMessageBox::critical(this, QLatin1String("Error"), QLatin1String(
+                                  "Could not publish message"));
+    }
 }
 
 void MainWindow::on_buttonSubscribe_clicked()
 {
     auto subscription = m_client->subscribe(ui->lineEditSubscribe->text());
 
-    if (!subscription) {
+    if (!subscription)
+    {
         QMessageBox::critical(this,
                               QLatin1String("Error"),
                               QLatin1String(
@@ -217,4 +216,18 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 }
 
 void MainWindow::on_ButtonOpen_clicked()
-{}
+{
+    if (m2mfun)
+    {
+        ui->ButtonOpen->setText(tr("Open"));
+        m2mfun->deleteLater();
+        m2mfun = nullptr;
+    }
+    else
+    {
+        ui->ButtonOpen->setText(tr("Close"));
+        m2mfun = new M2MFun(ui->lineEditdeviceName->text());
+
+        m2mfun->show();
+    }
+}

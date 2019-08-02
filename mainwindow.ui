@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>IMCQ</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -89,6 +89,20 @@
          <widget class="QLineEdit" name="lineEditPassWord">
           <property name="text">
            <string>22924838AD0F92CCCBE1BD590C831084</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>deviceName</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QLineEdit" name="lineEditdeviceName">
+          <property name="text">
+           <string>ClientM2MB</string>
           </property>
          </widget>
         </item>
