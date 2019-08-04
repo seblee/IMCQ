@@ -71,27 +71,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(
 
     connect(m_client, &QMqttClient::stateChanged,    this,
             &MainWindow::updateLogStateChange);
+
     connect(m_client, &QMqttClient::disconnected,    this,
             &MainWindow::brokerDisconnected);
 
-    connect(m_client, &QMqttClient::messageReceived, this, [this](const
-                                                                  QByteArray&
-                                                                  message,
-                                                                  const
-                                                                  QMqttTopicName&
-                                                                  topic) {
+    connect(m_client, &QMqttClient::messageReceived, this,
+            [this](const QByteArray& message,
+                   const QMqttTopicName& topic) {
         const QString content = QDateTime::currentDateTime().toString() +
-                                QLatin1String(
-            " Received Topic: ") + topic.name() + QLatin1String(
-            " Message: ") + message + QLatin1Char('\n');
+                                QLatin1String(" Received Topic: ") +
+                                topic.name() +
+                                QLatin1String(" Message: ") +
+                                message +
+                                QLatin1Char('\n');
         ui->editLog->insertPlainText(content);
     });
 
     connect(m_client, &QMqttClient::pingResponseReceived, this, [this]() {
         ui->buttonPing->setEnabled(true);
         const QString content = QDateTime::currentDateTime().toString() +
-                                QLatin1String(" PingResponse") + QLatin1Char(
-            '\n');
+                                QLatin1String(" PingResponse") +
+                                QLatin1Char('\n');
         ui->editLog->insertPlainText(content);
     });
     connect(m_client, &QMqttClient::errorChanged, this, [this]() {
@@ -158,8 +158,8 @@ void MainWindow::on_buttonQuit_clicked()
 void MainWindow::updateLogStateChange()
 {
     const QString content = QDateTime::currentDateTime().toString() +
-                            QLatin1String(": State Change") + QString::number(
-        m_client->state()) +
+                            QLatin1String(": State Change") +
+                            QString::number(m_client->state()) +
                             QLatin1Char('\n');
 
     ui->editLog->insertPlainText(content);
@@ -182,8 +182,8 @@ void MainWindow::on_buttonPublish_clicked()
     if (m_client->publish(ui->lineEditPublish->text(),
                           ui->lineEditMessage->text().toUtf8()) == -1)
     {
-        QMessageBox::critical(this, QLatin1String("Error"), QLatin1String(
-                                  "Could not publish message"));
+        QMessageBox::critical(this, QLatin1String("Error"),
+                              QLatin1String("Could not publish message"));
     }
 }
 
@@ -219,15 +219,21 @@ void MainWindow::on_ButtonOpen_clicked()
 {
     if (m2mfun)
     {
-        ui->ButtonOpen->setText(tr("Open"));
         m2mfun->deleteLater();
-        m2mfun = nullptr;
     }
     else
     {
         ui->ButtonOpen->setText(tr("Close"));
-        m2mfun = new M2MFun(ui->lineEditdeviceName->text());
-
+        m2mfun = new M2MFun(this);
+        m2mfun->deviceNameSet(ui->lineEditdeviceName->text());
+        connect(m2mfun, &M2MFun::destroyed, this,
+                &MainWindow::m2mDestryed);
         m2mfun->show();
     }
+}
+
+void MainWindow::m2mDestryed()
+{
+    ui->ButtonOpen->setText(tr("Open"));
+    m2mfun = nullptr;
 }

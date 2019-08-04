@@ -60,17 +60,20 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow: public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
+
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 public slots:
+
     void setClientPort(int p);
 
 private slots:
+
     void on_buttonConnect_clicked();
     void on_buttonQuit_clicked();
     void updateLogStateChange();
@@ -85,7 +88,10 @@ private slots:
 
     void on_ButtonOpen_clicked();
 
+    void m2mDestryed();
+
 private:
+
     Ui::MainWindow *ui;
     QMqttClient *m_client;
 
