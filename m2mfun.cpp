@@ -1,44 +1,33 @@
 #include "m2mfun.h"
 #include "ui_m2mfun.h"
 #include <QCryptographicHash>
-#include <QDebug>
 #include <QDateTime>
+#include <QDebug>
 #include <QMessageBox>
-#include <QUrlQuery>
 #include <QTime>
+#include <QUrlQuery>
 
-M2MFun::M2MFun(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::M2MFun),
-    client(nullptr)
+M2MFun::M2MFun(QWidget *parent) : QMainWindow(parent), ui(new Ui::M2MFun), client(nullptr)
 {
     ui->setupUi(this);
     client = new QMqttClient(this);
-    connect(client, &QMqttClient::stateChanged,    this,
-            &M2MFun::updateState);
+    connect(client, &QMqttClient::stateChanged, this, &M2MFun::updateState);
 
-    connect(client, &QMqttClient::connected,       this,
-            &M2MFun::subscribe);
+    connect(client, &QMqttClient::connected, this, &M2MFun::subscribe);
 
-    connect(client, &QMqttClient::disconnected,    this,
-            &M2MFun::subscribe);
+    connect(client, &QMqttClient::disconnected, this, &M2MFun::subscribe);
 
     connect(client, &QMqttClient::messageReceived, this,
-            [this](const QByteArray& message,
-                   const QMqttTopicName& topic) {
-        const QString content = QDateTime::currentDateTime().toString() +
-                                QLatin1String(" Received Topic: ") +
-                                topic.name() +
-                                QLatin1String(" Message: ") +
-                                message +
-                                QLatin1Char('\n');
-        ui->textEditReceive->insertPlainText(content);
-    });
+            [this](const QByteArray &message, const QMqttTopicName &topic) {
+                const QString content = QDateTime::currentDateTime().toString() +
+                                        QLatin1String(" Received Topic: ") + topic.name() +
+                                        QLatin1String(" Message: ") + message + QLatin1Char('\n');
+                ui->textEditReceive->insertPlainText(content);
+            });
 
     connect(client, &QMqttClient::pingResponseReceived, this, [this]() {
         const QString content = QDateTime::currentDateTime().toString() +
-                                QLatin1String(" PingResponse") +
-                                QLatin1Char('\n');
+                                QLatin1String(" PingResponse") + QLatin1Char('\n');
         ui->textEditLog->append(content);
     });
 
@@ -51,7 +40,8 @@ M2MFun::M2MFun(QWidget *parent) :
     qDebug() << tr("parent:");
 }
 
-M2MFun::~M2MFun() {
+M2MFun::~M2MFun()
+{
     delete ui;
 }
 
@@ -72,10 +62,10 @@ void M2MFun::deviceNameSet(QString DN)
 
     QByteArray key(DEVICE_SECRET);
     QByteArray baseString(tr("clientId%1deviceName%2productKey%3")
-                          .arg(tr("ClientM2MB"))
-                          .arg(DN)
-                          .arg(PRODUCT_KEY)
-                          .toUtf8());
+                              .arg(tr("ClientM2MB"))
+                              .arg(DN)
+                              .arg(PRODUCT_KEY)
+                              .toUtf8());
     qDebug() << tr("baseString:") << baseString;
     Password = hmac_md5(key, baseString);
     qDebug() << tr("Hostname:") << Hostname;
@@ -109,8 +99,10 @@ QString M2MFun::hmac_md5(QByteArray key, QByteArray baseString)
     qDebug() << tr("key:") << key;
     qDebug() << tr("baseString:") << baseString;
 
-    // if key is longer than block size (64), reduce key length with md5 compression
-    if (key.length() > blockSize) {
+    // if key is longer than block size (64), reduce key length with md5
+    // compression
+    if (key.length() > blockSize)
+    {
         key = QCryptographicHash::hash(key, QCryptographicHash::Md5);
     }
 
@@ -120,18 +112,21 @@ QString M2MFun::hmac_md5(QByteArray key, QByteArray baseString)
     // initialize outer padding with char "/"
     QByteArray outerPadding(blockSize, char(0x5c));
 
-
     // ascii characters 0x36 ("6") and 0x5c ("/") are selected because they have
     // large Hamming distance (http://en.wikipedia.org/wiki/Hamming_distance)
-    for (int i = 0; i < key.length(); i++) {
-        // XOR operation between every byte in key and innerpadding, of key length
+    for (int i = 0; i < key.length(); i++)
+    {
+        // XOR operation between every byte in key and innerpadding, of key
+        // length
         innerPadding[i] = innerPadding[i] ^ key.at(i);
 
-        // XOR operation between every byte in key and outerpadding, of key length
+        // XOR operation between every byte in key and outerpadding, of key
+        // length
         outerPadding[i] = outerPadding[i] ^ key.at(i);
     }
 
-    // result = hash ( outerPadding CONCAT hash ( innerPadding CONCAT baseString ) ).toBase64
+    // result = hash ( outerPadding CONCAT hash ( innerPadding CONCAT baseString
+    // ) ).toBase64
     QByteArray total = outerPadding;
     QByteArray part  = innerPadding;
     part.append(baseString);
@@ -140,21 +135,53 @@ QString M2MFun::hmac_md5(QByteArray key, QByteArray baseString)
     return hashed.toHex().toUpper();
 }
 
+QString M2MFun::hmac_sha1(QByteArray key, QByteArray baseString)
+{
+    // HMAC-SHA-1 block size, defined in SHA-1 standard
+    int blockSize = 64;
+    if (key.length() > blockSize)
+    {
+        // if key is longer than block size (64), reduce key length with SHA-1 compression
+        key = QCryptographicHash::hash(key, QCryptographicHash::Sha1);
+    }
+    // initialize inner padding with char "6"
+    QByteArray innerPadding(blockSize, char(0x36));
+    // initialize outer padding with char "/"
+    QByteArray outerPadding(blockSize, char(0x5c));
+    // ascii characters 0x36 ("6") and 0x5c ("/") are selected because they have large
+    // Hamming distance (http://en.wikipedia.org/wiki/Hamming_distance)
+    for (int i = 0; i < key.length(); i++)
+    {
+        // XOR operation between every byte in key and innerpadding, of key length
+        innerPadding[i] = innerPadding[i] ^ key.at(i);
+        // XOR operation between every byte in key and outerpadding, of key length
+        outerPadding[i] = outerPadding[i] ^ key.at(i);
+    }
+    // result = hash ( outerPadding CONCAT hash ( innerPadding CONCAT baseString ) ).toBase64
+    QByteArray total = outerPadding;
+    QByteArray part  = innerPadding;
+    part.append(baseString);
+    total.append(QCryptographicHash::hash(part, QCryptographicHash::Sha1));
+    QByteArray hashed = QCryptographicHash::hash(total, QCryptographicHash::Sha1);
+    /// 注意——>把字符串hashed转换为Hex，内存中的ASCII码arrayFromHexString
+    QByteArray arrayFromHexString = QByteArray::fromHex(hashed.toHex());
+    qDebug() << "hmacSha1内存中的ASCII码 arrayFromHexString \n" << arrayFromHexString.toHex();
+    return hashed.toBase64();
+}
+
 void M2MFun::subscribe()
 {
     if (client->state() == QMqttClient::Connected)
     {
-        auto subscription =  client->subscribe(tr("/%1/%2/user/M2MGET")
-                                               .arg(tr(PRODUCT_KEY))
-                                               .arg(deviceName));
+        auto subscription =
+            client->subscribe(tr("/%1/%2/user/M2MGET").arg(tr(PRODUCT_KEY)).arg(deviceName));
         qDebug() << tr("subscribe");
 
         if (!subscription)
         {
-            QMessageBox::critical(this,
-                                  QLatin1String("Error"),
-                                  QLatin1String(
-                                      "Could not subscribe. Is there a valid connection?"));
+            QMessageBox::critical(
+                this, QLatin1String("Error"),
+                QLatin1String("Could not subscribe. Is there a valid connection?"));
         }
     }
 }
@@ -172,32 +199,38 @@ quint64 M2MFun::get_random_number()
 }
 
 /***
- * LTAIGjMmXQtgefYP 9o1ujvbf18ESe6mFpmJFpQwsHmLwl2
- *
+ * LTAIejxZIeY54fCN gBjEbIY4fE10sfxKJqoTJ21y4TGpKp
  */
 QUrlQuery M2MFun::getQueryDeviceQurey()
 {
     QUrlQuery query;
 
-    query.addQueryItem(tr("Format"),          tr("JSON"));
-    query.addQueryItem(tr("Action"),          tr("QueryDevice"));
-    query.addQueryItem(tr("ProductKey"),      tr(PRODUCT_KEY));
-    query.addQueryItem(tr("PageSize"),        tr("10"));
-    query.addQueryItem(tr("CurrentPage"),     tr("1"));
-    query.addQueryItem(tr("Version"),         tr("2018-01-20"));
-    query.addQueryItem(tr("AccessKeyId"),     tr("LTAIGjMmXQtgefYP"));
-    query.addQueryItem(tr("Signature"),       tr("LTAI37ciXEGJxwP5"));
-    query.addQueryItem(tr("SignatureMethod"), tr("HMAC-SHA1"));
-    query.addQueryItem(tr("Timestamp"),
-                       QDateTime::currentDateTime()
-                       .toString("YYYY-MM-DDTHH:mm:ssZ"));
-    query.addQueryItem(tr("SignatureVersion"), tr("1.0"));
-    query.addQueryItem(tr("SignatureNonce"),
-                       QString::number(get_random_number(), 10));
+    query.addQueryItem(tr("AccessKeyId"), tr("LTAIejxZIeY54fCN"));
+    query.addQueryItem(tr("Action"), tr("QueryDevice"));
+    query.addQueryItem(tr("CurrentPage"), tr("1"));
+    query.addQueryItem(tr("Format"), tr("JSON"));
+    query.addQueryItem(tr("PageSize"), tr("10"));
+    query.addQueryItem(tr("ProductKey"), tr(PRODUCT_KEY));
     query.addQueryItem(tr("RegionId"), tr("cn-shanghai"));
+    query.addQueryItem(tr("SignatureMethod"), tr("HMAC-SHA1"));
+    query.addQueryItem(tr("SignatureNonce"), QString::number(get_random_number(), 10));
+    query.addQueryItem(tr("SignatureVersion"), tr("1.0"));
+    query.addQueryItem(tr("Timestamp"),
+                       QUrl::toPercentEncoding(
+                           QDateTime::currentDateTime().toUTC().toString(Qt::ISODate) + tr("Z")));
+    query.addQueryItem(tr("Version"), tr("2018-01-20"));
 
-    qDebug() << tr("query:") << query.toString();
+    QByteArray stringToSign;
+    stringToSign.append("GET");
+    stringToSign.append("&");
+    stringToSign.append(QUrl::toPercentEncoding("/", "", "/"));
+    stringToSign.append("&");
+    stringToSign.append(QUrl::toPercentEncoding(query.toString().toUtf8(), "", ""));
 
+    QByteArray sha1 =
+        hmac_sha1(QByteArray("gBjEbIY4fE10sfxKJqoTJ21y4TGpKp&"), stringToSign).toUtf8();
+
+    query.addQueryItem("Signature", QUrl::toPercentEncoding(sha1));
 
     return query;
 }
@@ -210,8 +243,7 @@ void M2MFun::brokerDisconnected()
 void M2MFun::updateState()
 {
     const QString content = QDateTime::currentDateTime().toString() +
-                            QLatin1String(": State Change") +
-                            QString::number(client->state()) +
+                            QLatin1String(": State Change") + QString::number(client->state()) +
                             QLatin1Char('\n');
 
     ui->textEditLog->append(content);
@@ -241,8 +273,8 @@ void M2MFun::on_pushButtonSend_clicked()
         //                                    .arg(deviceName)),
         //                            ui->plainTextEditSend->getPaintContext().))
         {
-            QMessageBox::critical(this, QLatin1String("Error"), QLatin1String(
-                                      "Could not publish message"));
+            QMessageBox::critical(this, QLatin1String("Error"),
+                                  QLatin1String("Could not publish message"));
         }
     }
 }
@@ -250,4 +282,59 @@ void M2MFun::on_pushButtonSend_clicked()
 void M2MFun::on_pushButtonRefresh_clicked()
 {
     QUrl url("https://iot.cn-shanghai.aliyuncs.com");
+
+    QUrlQuery query = getQueryDeviceQurey();
+
+    url.setQuery(query);
+
+    qDebug() << url.toString();
+
+    m_AccessManager = new QNetworkAccessManager(this);
+
+    QSslConfiguration config;
+    config.setPeerVerifyDepth(QSslSocket::VerifyNone);
+    config.setProtocol(QSsl::TlsV1_2);
+    m_Request.setSslConfiguration(config);
+    m_Request.setUrl(url);
+    m_Request.setRawHeader("Host", url.host().toLocal8Bit());
+
+    m_reply = m_AccessManager->get(m_Request);
+    connect(m_AccessManager, &QNetworkAccessManager::finished, this, &M2MFun::ReplyReadFunc);
+    disconnect(&timer, &QTimer::timeout, nullptr, nullptr);
+    connect(&timer, &QTimer::timeout, this, &M2MFun::handleTimeOut);
+
+    if (timer.isActive())
+    {
+        timer.stop();
+    }
+    timer.start(5000);
+}
+
+void M2MFun::ReplyReadFunc(QNetworkReply *reply)
+{
+    if (timer.isActive())
+    {
+        timer.stop();
+    }
+
+    if (reply->error() == QNetworkReply::NoError)
+    {
+        QByteArray response = reply->readAll();
+        ui->listWidget->addItem(tr("1"));
+    }
+    else
+    {
+        ui->listWidget->addItem(tr("error:") + QString::number(reply->error(), 10));
+    }
+    m_reply->deleteLater();
+
+    ui->statusbar->showMessage(tr("Refresh Complete"), 3000);
+}
+
+void M2MFun::handleTimeOut()
+{
+    timer.stop();
+    m_reply->abort();
+    m_reply->deleteLater();
+    ui->statusbar->showMessage(tr("Refresh time out"), 3000);
 }

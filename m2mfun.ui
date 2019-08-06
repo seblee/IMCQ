@@ -20,9 +20,6 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QTextEdit" name="textEditReceive"/>
-        </item>
-        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -36,6 +33,9 @@
          </spacer>
         </item>
         <item>
+         <widget class="QTextEdit" name="textEditReceive"/>
+        </item>
+        <item>
          <widget class="QPlainTextEdit" name="plainTextEditSend"/>
         </item>
        </layout>
@@ -43,7 +43,10 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QTextEdit" name="textEdit"/>
+         <widget class="QListWidget" name="listWidget"/>
+        </item>
+        <item>
+         <widget class="QTreeView" name="treeView"/>
         </item>
         <item>
          <widget class="QPushButton" name="pushButtonRefresh">
