@@ -11,12 +11,12 @@
 #include <QTimer>
 #include <QMap>
 
-#define HOST_NAME ".iot-as-mqtt.cn-shanghai.aliyuncs.com"
-#define PRODUCT_KEY "a1BlDo53A1B"
-#define PRODUCT_SECRET "7jluWm1zql7bt8qK"
-#define DEVICE_SECRET "kkwHzbm3hVbaoepFdx37Exr3fXyDVcPq"
+#include "memberinfo.h"
 
-typedef QMap<QString, QString> memberList;
+#define HOST_NAME       ".iot-as-mqtt.cn-shanghai.aliyuncs.com"
+#define PRODUCT_KEY     "a1BlDo53A1B"
+#define PRODUCT_SECRET  "7jluWm1zql7bt8qK"
+#define DEVICE_SECRET   "kkwHzbm3hVbaoepFdx37Exr3fXyDVcPq"
 
 namespace Ui {
 class M2MFun;
@@ -59,7 +59,9 @@ private:
 
     QUrlQuery getQueryDeviceQurey();
 
-    QMap<QString, QString>memberList;
+    void      caculateClientPara();
+
+    QMap<QString, MemberInfo>memberList;
 
 private slots:
 

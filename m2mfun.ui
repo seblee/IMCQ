@@ -33,7 +33,11 @@
          </spacer>
         </item>
         <item>
-         <widget class="QTextEdit" name="textEditReceive"/>
+         <widget class="QTextEdit" name="textEditReceive">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPlainTextEdit" name="plainTextEditSend"/>
@@ -42,6 +46,13 @@
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="labelReceiver">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QListWidget" name="listWidget"/>
         </item>
@@ -91,5 +102,22 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>listWidget</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>labelReceiver</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>494</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>33</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

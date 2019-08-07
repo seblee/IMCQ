@@ -1,13 +1,13 @@
-#ifndef DEVICEINFO_H
-#define DEVICEINFO_H
+#ifndef MEMBERINFO_H
+#define MEMBERINFO_H
+
 #include <QString>
 
-
-class DeviceInfo {
+class MemberInfo {
 public:
 
-    DeviceInfo();
-    DeviceInfo(const QString& deviceid,
+    MemberInfo();
+    MemberInfo(const QString& deviceid,
                const QString& devicename,
                const QString& nickname,
                const QString& producekey,
@@ -21,25 +21,25 @@ public:
 
     QString deviceid() const;
 
-    QString devicename()const;
+    QString devicename() const;
 
-    QString nickname()const;
+    QString nickname() const;
 
-    QString producekey()const;
+    QString producekey() const;
 
-    QString devicesceret()const;
+    QString devicesceret() const;
 
-    QString utcmodified()const;
+    QString utcmodified() const;
 
-    QString gmtcreate()const;
+    QString gmtcreate() const;
 
-    QString utccreate()const;
+    QString utccreate() const;
 
-    QString gmtmodified()const;
+    QString gmtmodified() const;
 
-    QString iotid()const;
+    QString iotid() const;
 
-    QString devicestatus()const;
+    QString devicestatus() const;
 
 private:
 
@@ -56,4 +56,4 @@ private:
     QString DeviceStatus;
 };
 
-#endif // DEVICEINFO_H
+#endif // MEMBERINFO_H

@@ -10,7 +10,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-
 M2MFun::M2MFun(QWidget *parent) : QMainWindow(parent), ui(new Ui::M2MFun), client(
         nullptr)
 {
@@ -23,17 +22,18 @@ M2MFun::M2MFun(QWidget *parent) : QMainWindow(parent), ui(new Ui::M2MFun), clien
             [this](const QByteArray& message,
                    const QMqttTopicName& topic) {
         const QString content = QDateTime::currentDateTime().toString() +
-                                QLatin1String(
-            " Received Topic: ") + topic.name() +
-                                QLatin1String(
-            " Message: ") + message + QLatin1Char('\n');
+                                QLatin1String(" Received Topic: ") +
+                                topic.name() +
+                                QLatin1String(" Message: ") +
+                                message +
+                                QLatin1Char('\n');
         ui->textEditReceive->insertPlainText(content);
     });
 
     connect(client, &QMqttClient::pingResponseReceived, this, [this]() {
         const QString content = QDateTime::currentDateTime().toString() +
-                                QLatin1String(" PingResponse") + QLatin1Char(
-            '\n');
+                                QLatin1String(" PingResponse") +
+                                QLatin1Char('\n');
         ui->textEditLog->append(content);
     });
 
@@ -61,30 +61,14 @@ void M2MFun::deviceNameSet(QString DN)
     Hostname.append(PRODUCT_KEY);
     Hostname.append(HOST_NAME);
     Port       = 1883;
-    deviceName = QString(DN);
-    Username   = QString("%1&%2").arg(DN).arg(QString(PRODUCT_KEY));
-    ClientId   = QString("ClientM2MB|securemode=2,signmethod=hmacmd5|");
+    deviceName =  DN;
 
-    QByteArray key(DEVICE_SECRET);
-    QByteArray baseString(tr("clientId%1deviceName%2productKey%3")
-                          .arg(tr("ClientM2MB"))
-                          .arg(DN)
-                          .arg(PRODUCT_KEY)
-                          .toUtf8());
-    qDebug() << tr("baseString:") << baseString;
-    Password = hmac_md5(key, baseString);
-    qDebug() << tr("Hostname:") << Hostname;
-    qDebug() << tr("Port:") << QString::number(Port, 10);
-    qDebug() << tr("Username:") << Username;
-    qDebug() << tr("Password:") << Password;
-    qDebug() << tr("ClientId:") << ClientId;
-
-    client->setHostname(Hostname);
-    client->setPort(Port);
-    client->setUsername(Username);
-    client->setPassword(Password);
-    client->setClientId(ClientId);
-    client->setProtocolVersion(QMqttClient::MQTT_3_1);
+    if (memberList.isEmpty())
+    {
+        on_pushButtonRefresh_clicked();
+    } else {
+        caculateClientPara();
+    }
 }
 
 void M2MFun::keyPressEvent(QKeyEvent *event)
@@ -220,22 +204,21 @@ QUrlQuery M2MFun::getQueryDeviceQurey()
 {
     QUrlQuery query;
 
-    query.addQueryItem(tr("AccessKeyId"),     tr("LTAIejxZIeY54fCN"));
-    query.addQueryItem(tr("Action"),          tr("QueryDevice"));
-    query.addQueryItem(tr("CurrentPage"),     tr("1"));
-    query.addQueryItem(tr("Format"),          tr("JSON"));
-    query.addQueryItem(tr("PageSize"),        tr("10"));
-    query.addQueryItem(tr("ProductKey"),      tr(PRODUCT_KEY));
-    query.addQueryItem(tr("RegionId"),        tr("cn-shanghai"));
-    query.addQueryItem(tr("SignatureMethod"), tr("HMAC-SHA1"));
-    query.addQueryItem(tr("SignatureNonce"),
-                       QString::number(get_random_number(), 10));
+    query.addQueryItem(tr("AccessKeyId"),      tr("LTAIejxZIeY54fCN"));
+    query.addQueryItem(tr("Action"),           tr("QueryDevice"));
+    query.addQueryItem(tr("CurrentPage"),      tr("1"));
+    query.addQueryItem(tr("Format"),           tr("JSON"));
+    query.addQueryItem(tr("PageSize"),         tr("10"));
+    query.addQueryItem(tr("ProductKey"),       tr(PRODUCT_KEY));
+    query.addQueryItem(tr("RegionId"),         tr("cn-shanghai"));
+    query.addQueryItem(tr("SignatureMethod"),  tr("HMAC-SHA1"));
+    query.addQueryItem(tr("SignatureNonce"),   QString::number(get_random_number(), 10));
     query.addQueryItem(tr("SignatureVersion"), tr("1.0"));
     query.addQueryItem(tr("Timestamp"),
-                       QUrl::toPercentEncoding(
-                           QDateTime::currentDateTime().toUTC()
-                           .toString(Qt::ISODate) +
-                           tr("Z")));
+                       QUrl::toPercentEncoding(QDateTime::currentDateTime()
+                                               .toUTC()
+                                               .toString(Qt::ISODate)
+                                               + tr("Z")));
     query.addQueryItem(tr("Version"), tr("2018-01-20"));
 
     QByteArray stringToSign;
@@ -243,8 +226,7 @@ QUrlQuery M2MFun::getQueryDeviceQurey()
     stringToSign.append("&");
     stringToSign.append(QUrl::toPercentEncoding("/", "", "/"));
     stringToSign.append("&");
-    stringToSign.append(QUrl::toPercentEncoding(query.toString()
-                                                .toUtf8(), "", ""));
+    stringToSign.append(QUrl::toPercentEncoding(query.toString().toUtf8(), "", ""));
 
     QByteArray sha1 =
         hmac_sha1(QByteArray("gBjEbIY4fE10sfxKJqoTJ21y4TGpKp&"),
@@ -253,6 +235,52 @@ QUrlQuery M2MFun::getQueryDeviceQurey()
     query.addQueryItem("Signature", QUrl::toPercentEncoding(sha1));
 
     return query;
+}
+
+void M2MFun::caculateClientPara()
+{
+    if (memberList.isEmpty())
+    {
+        QMessageBox::critical(
+            this, QLatin1String("Error"),
+            QLatin1String("memberList isEmpty"));
+        return;
+    }
+
+    if (memberList.contains(deviceName))
+    {
+        Username = QString("%1&%2")
+                   .arg(deviceName)
+                   .arg(memberList[deviceName].producekey());
+        ClientId = QString("%1|securemode=2,signmethod=hmacmd5|")
+                   .arg(memberList[deviceName].deviceid());
+
+        QByteArray key = memberList[deviceName].devicesceret().toUtf8();
+        QByteArray baseString(tr("clientId%1deviceName%2productKey%3")
+                              .arg(memberList[deviceName].deviceid())
+                              .arg(deviceName)
+                              .arg(memberList[deviceName].producekey())
+                              .toUtf8());
+        Password = hmac_md5(key, baseString);
+        qDebug() << tr("Hostname:") << Hostname;
+        qDebug() << tr("Port:") << QString::number(Port, 10);
+        qDebug() << tr("Username:") << Username;
+        qDebug() << tr("Password:") << Password;
+        qDebug() << tr("ClientId:") << ClientId;
+
+        client->setHostname(Hostname);
+        client->setPort(Port);
+        client->setUsername(Username);
+        client->setPassword(Password);
+        client->setClientId(ClientId);
+        client->setProtocolVersion(QMqttClient::MQTT_3_1);
+    }
+    else
+    {
+        QMessageBox::critical(
+            this, QLatin1String("Error"),
+            QLatin1String("deviceName is not correct"));
+    }
 }
 
 void M2MFun::brokerDisconnected()
@@ -289,10 +317,20 @@ void M2MFun::on_pushButtonSend_clicked()
 {
     if (client->state() == QMqttClient::Connected)
     {
-        //        if (client->publish(QString(tr("/%1/%2/user/M2MPUT")
-        //                                    .arg(PRODUCT_KEY)
-        //                                    .arg(deviceName)),
-        //                            ui->plainTextEditSend->getPaintContext().))
+        QJsonObject json;
+        json.insert(tr("dName"), QJsonValue(ui->labelReceiver->text()));
+        json.insert(tr("Message"),
+                    QJsonValue(ui->plainTextEditSend->toPlainText()));
+
+        QJsonDocument document;
+        document.setObject(json);
+        QByteArray message = document.toJson(QJsonDocument::Compact);
+
+
+        if (client->publish(QString(tr("/%1/%2/user/M2MPUT")
+                                    .arg(PRODUCT_KEY)
+                                    .arg(deviceName)),
+                            message) == -1)
         {
             QMessageBox::critical(this, QLatin1String("Error"),
                                   QLatin1String("Could not publish message"));
@@ -348,77 +386,136 @@ void M2MFun::ReplyReadFunc(QNetworkReply *reply)
         QJsonDocument   doucment = QJsonDocument::fromJson(response, &jsonError);
         ui->textEditLog->append(QString::fromUtf8(response));
 
-        if (!doucment.isNull() &&
-            (jsonError.error == QJsonParseError::NoError))
+        if (!doucment.isNull() && (jsonError.error == QJsonParseError::NoError))
         {
-            int  PageCount;
-            int  Page;
-            int  PageSize;
-            int  RequestId;
-            bool sucess;
-            int  Total;
-            QJsonDocument Data;
+            int PageCount;
+            int Page;
+            int PageSize;
+            QString RequestId;
+            bool    Success;
+            int     Total;
 
             if (doucment.isObject())                    // JSON 文档为对象
             {
                 QJsonObject object = doucment.object(); // 转化为对象
+                qDebug() << tr("doucment.isObject()");
 
                 if (object.contains("PageCount"))
                 {
                     PageCount = object.value("PageCount").toVariant().toInt();
+                    qDebug() << tr("PageCount:") << PageCount;
                 }
 
                 if (object.contains("Page"))
                 {
                     Page = object.value("Page").toVariant().toInt();
+                    qDebug() << tr("Page:") << Page;
                 }
 
                 if (object.contains("PageSize"))
                 {
                     PageSize = object.value("PageSize").toVariant().toInt();
+                    qDebug() << tr("PageSize:") << PageSize;
                 }
 
                 if (object.contains("RequestId"))
                 {
-                    RequestId = object.value("RequestId").toVariant().toInt();
+                    RequestId = object.value("RequestId").toVariant().toString();
+                    qDebug() << tr("RequestId:") << RequestId;
                 }
 
-                if (object.contains("sucess"))
+                if (object.contains("Success"))
                 {
-                    sucess = object.value("sucess").toVariant().toBool();
+                    Success = object.value("Success").toVariant().toBool();
+                    qDebug() << tr("Success:") << Success;
                 }
 
                 if (object.contains("Total"))
                 {
                     Total = object.value("Total").toVariant().toInt();
+                    qDebug() << tr("Total:") << Total;
                 }
 
                 if (object.contains("Data"))
                 {
-                    Data = object.value("Data").toVariant().toJsonDocument();
+                    qDebug() << tr("Data.isObject()") <<
+                        object.value("Data").toVariant().toString();
 
-                    if (Data.isObject())
+                    QJsonObject dataObject = object.value("Data").toObject();
+
+                    qDebug() << tr("dataObject") << dataObject;
+
+                    if (dataObject.contains("DeviceInfo"))
                     {
-                        QJsonObject dataObject = Data.object();
+                        qDebug() << tr("dataObject contains DeviceInfo");
+                        memberList.clear();
+                        ui->listWidget->clear();
+                        QJsonArray DeviceInfo =
+                            dataObject.value("DeviceInfo").toArray();
+                        int deviceSize = DeviceInfo.size();
 
-                        if (dataObject.contains("DeviceInfo"))
+                        for (int i = 0; i < deviceSize; i++)
                         {
-                            QJsonArray DeviceInfo =
-                                dataObject.value("DeviceInfo").toArray();
-                            int deviceSize = DeviceInfo.size();
+                            QJsonObject Device = DeviceInfo.at(i).toObject();
 
-                            for (int i = 0; i < deviceSize; i++) {
-                                QJsonObject Device = DeviceInfo.at(i).toObject();
-                                {}
-                            }
+                            QString DeviceId =
+                                Device.value("DeviceId").toVariant().toString();
+                            QString DeviceName =
+                                Device.value("DeviceName").toVariant().
+                                toString();
+                            QString Nickname =
+                                Device.value("Nickname").toVariant().toString();
+                            QString ProductKey =
+                                Device.value("ProductKey").toVariant().
+                                toString();
+                            QString DeviceSecret =
+                                Device.value("DeviceSecret").toVariant().
+                                toString();
+                            QString UtcModified =
+                                Device.value("UtcModified").toVariant().
+                                toString();
+                            QString GmtCreate =
+                                Device.value("GmtCreate").toVariant().toString();
+                            QString UtcCreate =
+                                Device.value("UtcCreate").toVariant().toString();
+                            QString GmtModified =
+                                Device.value("GmtModified").toVariant().
+                                toString();
+                            QString IotId =
+                                Device.value("IotId").toVariant().toString();
+                            QString DeviceStatus =
+                                Device.value("DeviceStatus").toVariant().
+                                toString();
+
+                            memberList.insert(DeviceName,
+                                              MemberInfo(DeviceId,
+                                                         DeviceName,
+                                                         Nickname,
+                                                         ProductKey,
+                                                         DeviceSecret,
+                                                         UtcModified,
+                                                         GmtCreate,
+                                                         UtcCreate,
+                                                         GmtModified,
+                                                         IotId,
+                                                         DeviceStatus));
+                            qDebug() << tr("DeviceName") << DeviceName;
+                            QListWidgetItem *Item =
+                                new QListWidgetItem(DeviceName, ui->listWidget);
+                            ui->listWidget->addItem(Item);
                         }
+
+                        if (ui->listWidget->count() > 0)
+                        {
+                            ui->listWidget->setCurrentRow(0);
+                        }
+                        caculateClientPara();
                     }
                 }
             }
         }
-        else {}
-
-        ui->listWidget->addItem(tr("1"));
+        else
+        {}
     }
     else
     {

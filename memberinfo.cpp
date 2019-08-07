@@ -1,9 +1,9 @@
-#include "deviceinfo.h"
+#include "memberinfo.h"
 
-DeviceInfo::DeviceInfo()
+MemberInfo::MemberInfo()
 {}
 
-DeviceInfo::DeviceInfo(const QString& deviceid,
+MemberInfo::MemberInfo(const QString& deviceid,
                        const QString& devicename,
                        const QString& nickname,
                        const QString& producekey,
@@ -27,46 +27,46 @@ DeviceInfo::DeviceInfo(const QString& deviceid,
     DeviceStatus(devicestatus)
 {}
 
-QString DeviceInfo::deviceid() const {
+QString MemberInfo::deviceid() const {
     return DeviceId;
 }
 
-QString DeviceInfo::devicename() const {
+QString MemberInfo::devicename() const {
     return DeviceName;
 }
 
-QString DeviceInfo::nickname() const {
+QString MemberInfo::nickname() const {
     return Nickname;
 }
 
-QString DeviceInfo::producekey() const {
+QString MemberInfo::producekey() const {
     return ProductKey;
 }
 
-QString DeviceInfo::devicesceret() const {
+QString MemberInfo::devicesceret() const {
     return DeviceSecret;
 }
 
-QString DeviceInfo::utcmodified() const {
+QString MemberInfo::utcmodified() const {
     return UtcModified;
 }
 
-QString DeviceInfo::gmtcreate() const {
+QString MemberInfo::gmtcreate() const {
     return GmtCreate;
 }
 
-QString DeviceInfo::utccreate() const {
+QString MemberInfo::utccreate() const {
     return UtcCreate;
 }
 
-QString DeviceInfo::gmtmodified() const {
+QString MemberInfo::gmtmodified() const {
     return GmtModified;
 }
 
-QString DeviceInfo::iotid() const {
+QString MemberInfo::iotid() const {
     return IotId;
 }
 
-QString DeviceInfo::devicestatus() const {
+QString MemberInfo::devicestatus() const {
     return DeviceStatus;
 }
