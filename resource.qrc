@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Root">
+        <file>Image/TriangleLeft.png</file>
+        <file>Image/TriangleRight.png</file>
+    </qresource>
+</RCC>

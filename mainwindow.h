@@ -54,7 +54,7 @@
 #include <QMainWindow>
 #include <QtMqtt/QMqttClient>
 #include <QKeyEvent>
-#include "m2mfun.h"
+#include <m2mfun.h>
 
 namespace Ui {
 class MainWindow;
@@ -70,21 +70,9 @@ public:
 
 public slots:
 
-    void setClientPort(int p);
-
 private slots:
 
-    void on_buttonConnect_clicked();
     void on_buttonQuit_clicked();
-    void updateLogStateChange();
-
-    void brokerDisconnected();
-
-    void on_buttonPublish_clicked();
-
-    void on_buttonSubscribe_clicked();
-
-    void on_buttonPing_clicked();
 
     void on_ButtonOpen_clicked();
 
@@ -93,7 +81,6 @@ private slots:
 private:
 
     Ui::MainWindow *ui;
-    QMqttClient *m_client;
 
     void keyPressEvent(QKeyEvent *event);
 

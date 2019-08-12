@@ -54,12 +54,12 @@
 #include <QMessageBox>
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    MainWindow w;
+    MainWindow   w;
 
     if (!QSslSocket::supportsSsl()) {
-    QMessageBox::information(0, "Secure Socket Client",
-        "This system does not support SSL/TLS.");
-    return -1;
+        QMessageBox::information(nullptr, "Secure Socket Client",
+                                 "This system does not support SSL/TLS.");
+        return -1;
     }
     w.show();
 
